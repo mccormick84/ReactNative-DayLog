@@ -12,27 +12,9 @@ function WriteScreen({route}) {
   const [title, setTitle] = useState(log?.title ?? '');
   const [body, setBody] = useState(log?.body ?? '');
   const navigation = useNavigation();
+  const [date, setDate] = useState(log ? new Date(log.date) : new Date());
 
   const {onCreate, onModify, onRemove} = useContext(LogContext);
-
-  const onSave = () => {
-    // onCreate를 호출하고 이전화면으로 되돌아 감(navigation.pop())
-    if (log) {
-      onModify({
-        id: log.id,
-        date: log.date,
-        title,
-        body,
-      });
-    } else {
-      onCreate({
-        title,
-        body,
-        date: new Date().toISOString(),
-      });
-    }
-    navigation.pop();
-  };
 
   const onAskRemove = () => {
     Alert.alert(
@@ -55,6 +37,25 @@ function WriteScreen({route}) {
     );
   };
 
+  const onSave = () => {
+    // onCreate를 호출하고 이전화면으로 되돌아 감(navigation.pop())
+    if (log) {
+      onModify({
+        id: log.id,
+        date: date.toISOString(),
+        title,
+        body,
+      });
+    } else {
+      onCreate({
+        title,
+        body,
+        date: date.toISOString(),
+      });
+    }
+    navigation.pop();
+  };
+
   return (
     <SafeAreaView style={styles.block}>
       <KeyboardAvoidingView
@@ -64,6 +65,8 @@ function WriteScreen({route}) {
           onSave={onSave}
           onAskRemove={onAskRemove}
           isEditing={!!log}
+          date={date}
+          onChangeDate={setDate}
         />
         <WriteEditor
           title={title}
